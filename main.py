@@ -1,46 +1,68 @@
 # Tic Tac Toe
+#initialize board size
+boardSize = " "
+while (not(boardSize.isdigit())):
+    boardSize = input("please type in the board size: ")
 
-boardSize = 3
-board = [" " for i in range(boardSize ** 2)]
+boardSize = int(boardSize)
 
+#initialize board
+board = [[" " for i in range(boardSize)] for j in range(boardSize)]
 
-def insert_letter(letter, pos):
-    board[pos] = letter
+#functions
 
+#checks if space is free at coordinates
+def space_is_free(pos_x, pos_y):
+    return board[pos_y][pos_x] == " "
 
-# returns 1 if space is free
-def space_is_free(pos):
-    return board[pos] == " "
+#inserts letter at given coordinates
+def insert_letter(letter, pos_x, pos_y):
+    board[pos_y][pos_x] = letter
 
-
+#prints board
 def print_board(boardSize, board):
     for i in range(boardSize):
         for j in range(boardSize):
-            print("| {}".format(board[i * boardSize + j]), end=" ")
+            print("| {}".format(board[i][j]), end=" ")
         print("|")
 
+#checks if letter is the same in row/column/diagonals
+def is_winner(board, letter):
+    winner = False #main bool variable that is returned
+    main_diagonal = True #main diagonal bool var
+    secondary_diagonal = True #secondary diagonal bool var
+    for i in range(boardSize):
+        if board[i][i] != letter: #main diagonal check
+            main_diagonal = False 
+        if board[boardSize - i - 1][boardSize - i - 1] != letter: #secondary diagonal check
+            secondary_diagonal = False
 
-def is_winner(bo, letter):
-    return (bo[6] == letter and bo[7] == letter and bo[8] == letter) or \
-           (bo[3] == letter and bo[4] == letter and bo[5] == letter) or \
-           (bo[0] == letter and bo[1] == letter and bo[2] == letter) or \
-           (bo[0] == letter and bo[3] == letter and bo[6] == letter) or \
-           (bo[1] == letter and bo[4] == letter and bo[7] == letter) or \
-           (bo[2] == letter and bo[5] == letter and bo[8] == letter) or \
-           (bo[0] == letter and bo[4] == letter and bo[8] == letter) or \
-           (bo[2] == letter and bo[4] == letter and bo[6] == letter)
+        row = True #checks row every i cycle
+        column = True #checks column every i cycle
+        for j in range(boardSize):
+            if board[i][j] != letter: #row check
+                row = False
+            if board[j][i] != letter: #column check
+                column = False
 
+        winner = winner or row or column #winner == true if any row or column == true
+    winner = winner or main_diagonal or secondary_diagonal #winner == true if any diagonal == true
+    return winner
 
-def player_move():
+def player_move(letter):
     run = True
     while run:
-        move = input("Select a position to place an X (0-8): ")
+        move = []
+        while len(move) != 2: #x and y position input into array, check for length == 2
+            print()
+            move = input("Select x and y position to place an {} (0-{}):".format(letter, boardSize-1, end= " ")).split()
         try:
-            move = int(move)
-            if move >= 0 and move <= 8:
-                if space_is_free(move):
+            move[0] = int(move[0])
+            move[1] = int(move[1])
+            if move[0] >= 0 and move[0] <= boardSize and move[1] >= 0 and move[1] <= boardSize:
+                if space_is_free(move[0], move[1]):
                     run = False
-                    insert_letter("X", move)
+                    insert_letter(letter, move[0], move[1])
                 else:
                     print("Space isn't free")
             else:
@@ -48,89 +70,27 @@ def player_move():
         except:
             print("type a number")
 
-
-def player2_move():
-    run = True
-    while run:
-        move = input("Select a position to place an O (0-8): ")
-        try:
-            move = int(move)
-            if move >= 0 and move <= 8:
-                if space_is_free(move):
-                    run = False
-                    insert_letter("O", move)
-                else:
-                    print("Space isn't free")
-            else:
-                print("Please type a number within the range")
-        except:
-            print("type a number")
-
-
-def comp_move():
-    possibleMoves = [x for x, letter in enumerate(board) if letter == " "]
-    move = 0
-
-    for letter in ["O", "X"]:
-        for i in possibleMoves:
-            boardCopy = board[:]
-            boardCopy[i] = letter
-            if is_winner(boardCopy, letter):
-                move = i
-                return move
-
-    if 4 in possibleMoves:
-        move = 4
-        return move
-
-    openCorners = []
-    for i in possibleMoves:
-        if i in [0, 2, 6, 8]:
-            openCorners.append(i)
-
-    if len(openCorners) > 0:
-        move = select_random(openCorners)
-        return move
-
-    openEdges = []
-    for i in possibleMoves:
-        if i in [1, 3, 5, 7]:
-            openEdges.append(i)
-
-    if len(openEdges) > 0:
-        move = select_random(openEdges)
-
-    return move
-
-def select_random(li):
-    import random
-    ln = len(li)
-    r = random.randrange(0, ln)
-    return li[r]
 
 def board_is_full(board):
-    return not(board.count(" ") > 0)
+    for i in range(boardSize):
+        if board[i].count(" ") > 0:
+            return False
+    return True
 
 
 def main():
     print("Welcome to Tic Tac Toe")
+    
+
     print_board(boardSize, board)
 
     while not (board_is_full(board) or is_winner(board, "X") or is_winner(board, "O")):
         if not (is_winner(board, "O")):
-            player_move()
+            player_move("X")
             print_board(boardSize, board)
 
         if not (is_winner(board, "X")):
-            #player2_move()
-            move = comp_move()
-
-            if move != 0:
-                insert_letter("O", move)
-                print("Computer placed an O in {} :".format(move))
-            else:
-                print("Not able to come up with a move")
-
+            player_move("O")
 
             print_board(boardSize, board)
 
