@@ -2,7 +2,7 @@
 #initialize board size
 boardSize = " "
 while (not(boardSize.isdigit())):
-    boardSize = input("please type in the board size: ")
+    boardSize = input("Please type in the board size: ")
 
 boardSize = int(boardSize)
 
@@ -55,11 +55,11 @@ def player_move(letter):
         move = []
         while len(move) != 2: #x and y position input into array, check for length == 2
             print()
-            move = input("Select x and y position to place an {} (0-{}):".format(letter, boardSize-1, end= " ")).split()
+            move = input("Select x and y position to place an {} (0-{}, two numbers in line):".format(letter, boardSize-1, end= " ")).split()
         try:
             move[0] = int(move[0])
             move[1] = int(move[1])
-            if move[0] >= 0 and move[0] <= boardSize and move[1] >= 0 and move[1] <= boardSize:
+            if move[0] >= 0 and move[0] < boardSize and move[1] >= 0 and move[1] < boardSize:
                 if space_is_free(move[0], move[1]):
                     run = False
                     insert_letter(letter, move[0], move[1])
@@ -68,7 +68,7 @@ def player_move(letter):
             else:
                 print("Please type a number within the range")
         except:
-            print("type a number")
+            print("Type a number")
 
 
 def board_is_full(board):
@@ -80,8 +80,6 @@ def board_is_full(board):
 
 def main():
     print("Welcome to Tic Tac Toe")
-    
-
     print_board(boardSize, board)
 
     while not (board_is_full(board) or is_winner(board, "X") or is_winner(board, "O")):
@@ -103,6 +101,5 @@ def main():
 
     if board_is_full(board):
         print("Tie")
-
 
 main()
